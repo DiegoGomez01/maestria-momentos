@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:maestria_proyecto_momentos/menu_bar.dart';
+import 'package:maestria_proyecto_momentos/login.dart';
 
 void main() => runApp(MyApp());
 
@@ -22,7 +23,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: MenuBar(),
+      home: LoginScreen(),
     );
   }
 }
