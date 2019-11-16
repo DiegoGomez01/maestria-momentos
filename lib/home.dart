@@ -8,6 +8,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 
 class Home extends StatefulWidget {
@@ -34,7 +35,24 @@ class _HomePageState extends State<Home> {
             color: Colors.blueAccent,
             iconSize: 45.0,
             onPressed: () {
-              print(marker['title']);
+              return Alert(
+                  context: context,
+                  title: marker['title'],
+                  desc: marker['message'],
+                  style: AlertStyle(isCloseButton: false),
+                  buttons: [
+                    DialogButton(
+                      child: Text(
+                          "Ir",
+                          style: TextStyle(color: Colors.white),
+                      ),
+                      onPressed: () {
+                        print("ir");
+                      },
+
+                    )
+                  ]
+              ).show();
             },
           ),
         )
@@ -74,7 +92,6 @@ class _HomePageState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     _getCurrentLocation();
-    print(_markersView);
     return Scaffold(
       appBar: AppBar(
         title: Text("Location"),
