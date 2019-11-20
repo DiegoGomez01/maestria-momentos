@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_login/flutter_login.dart';
 import 'menu_bar.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert' as convert;
 
 const users = const {
   'dribbble@gmail.com': '12345',
@@ -9,18 +12,43 @@ const users = const {
 
 class LoginScreen extends StatelessWidget {
   Duration get loginTime => Duration(milliseconds: 2250);
+  var contextGeneral;
 
-  Future<String> _authUser(LoginData data) {
-    print('Name: ${data.name}, Password: ${data.password}');
-    return Future.delayed(loginTime).then((_) {
-      if (!users.containsKey(data.name)) {
-        return 'Username not exists';
-      }
-      if (users[data.name] != data.password) {
-        return 'Password does not match';
-      }
-      return null;
-    });
+  Future<String> _createUser(LoginData data) async {
+    print(data);
+    /*var response = await http.post(
+        Uri.encodeFull("http://192.168.20.56:3000/register"),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: convert.jsonEncode(
+            {
+              "name": data.username,
+              "email": data.name,
+              "password": data.password,
+              "gender": "M",
+              "age": data.age
+            }
+          )
+    );
+    if (!(response.statusCode >= 200 && response.statusCode < 210)) {
+      return convert.jsonDecode(response.body)['message'];
+    }*/
+    return 'ss';
+  }
+
+  Future<String> _authUser(LoginData data) async {
+    var response = await http.post(
+        Uri.encodeFull("http://192.168.20.56:3000/login"),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: convert.jsonEncode({'email':data.email, 'password':data.password})
+    );
+    if (!(response.statusCode >= 200 && response.statusCode < 210)) {
+      return convert.jsonDecode(response.body)['message'];
+    }
+    return '';
   }
 
   Future<String> _recoverPassword(String name) {
@@ -35,11 +63,12 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    this.contextGeneral = context;
     return FlutterLogin(
-      title: 'Momentos',
+      title: '',
       logo: 'assets/images/momentos.png',
       onLogin: _authUser,
-      onSignup: _authUser,
+      onSignup: _createUser,
       onSubmitAnimationCompleted: () {
         Navigator.of(context).pushReplacement(MaterialPageRoute(
           builder: (context) => MenuBar(),
