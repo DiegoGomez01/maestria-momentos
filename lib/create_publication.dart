@@ -1,9 +1,7 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
-import 'package:latlong/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
@@ -23,6 +21,7 @@ class CreatePublication extends StatelessWidget {
         ),
         body: new Container (
             padding: const EdgeInsets.all(30.0),
+            height: 800,
             color: Colors.white,
             child: new SingleChildScrollView(
               child: MyCustomForm()
@@ -132,18 +131,8 @@ class MyCustomFormState extends State<MyCustomForm> {
   }
 
   save(title, description) async {
-    /*var geolocator = Geolocator();
-    var locationOptions = LocationOptions(accuracy: LocationAccuracy.high, distanceFilter: 10);
-    StreamSubscription<Position> positionStream = geolocator.getPositionStream(locationOptions).listen(
-            (Position position) {
-              print(position);
-          if(position != 'Unknown') {
-            sendData(position, title, description);
-          }
-        });*/
     final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
-    geolocator
-        .getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
+    geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
         .then((Position position) {
             sendData(position, title, description);
     });
@@ -152,7 +141,7 @@ class MyCustomFormState extends State<MyCustomForm> {
   sendData(position, title, description) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var response = await http.post(
-        Uri.encodeFull("http://192.168.1.63:3000/publications"),
+        Uri.encodeFull("http://192.168.20.56:3000/publications"),
         headers: {
           "Content-Type": "application/json",
           "Authorization": "Bearer " + prefs.getString('token')

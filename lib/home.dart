@@ -9,7 +9,6 @@ import 'package:loading/loading.dart';
 import 'package:loading/indicator/ball_pulse_indicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
@@ -106,12 +105,12 @@ class _HomePageState extends State<Home> {
         markers.add(marker);
       }
     }
-    return markers;
+    _markersView = markers;
+    //return markers;
   }
 
   @override
   Widget build(BuildContext context) {
-    //_getCurrentLocation();
     return Scaffold(
       appBar: AppBar(
         title: Text("Location"),
@@ -148,39 +147,21 @@ class _HomePageState extends State<Home> {
     );
   }
 
-  _getCurrentLocation() async {
-    var geolocator = Geolocator();
-    var locationOptions = LocationOptions(accuracy: LocationAccuracy.high, distanceFilter: 10);
-    StreamSubscription<Position> positionStream = geolocator.getPositionStream(locationOptions).listen(
-      (Position position) {
-        if(position != 'Unknown') {
-          setState(() {
+  Future<bool> _getCurrentLocation() async {
+    final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
+    await geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
+        .then((Position position) {
             _currentPosition = position;
-            getMarkers().then((marks) => {
-              setState(() {
-                _markersView = marks;
-              })
-            });
-          });
-        }
     });
+    await getMarkers();
+    return Future.value(true);
   }
 
-  _getCurrentLocation2() {
-    final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
-    geolocator
-        .getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
-        .then((Position position) {
-      setState(() {
-        _currentPosition = position;
-      });
-    });
-  }
 
   _getAllPublications() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var response = await http.get(
-        Uri.encodeFull("http://192.168.1.63:3000/publications"),
+        Uri.encodeFull("http://192.168.20.56:3000/publications"),
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json",

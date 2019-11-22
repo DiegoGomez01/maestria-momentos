@@ -17,7 +17,7 @@ class LoginScreen extends StatelessWidget {
 
   Future<String> _createUser(LoginData data) async {
     var response = await http.post(
-        Uri.encodeFull("http://192.168.1.63:3000/register"),
+        Uri.encodeFull("http://192.168.20.56:3000/register"),
         headers: {
           "Content-Type": "application/json",
         },
@@ -38,7 +38,7 @@ class LoginScreen extends StatelessWidget {
 
   Future<String> _authUser(LoginData data) async {
     var response = await http.post(
-        Uri.encodeFull("http://192.168.1.63:3000/login"),
+        Uri.encodeFull("http://192.168.20.56:3000/login"),
         headers: {
           "Content-Type": "application/json",
         },
