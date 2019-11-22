@@ -5,6 +5,9 @@ import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 import 'dart:async';
+import 'package:loading/loading.dart';
+import 'package:loading/indicator/ball_pulse_indicator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -43,11 +46,11 @@ class _HomePageState extends State<Home> {
                   buttons: [
                     DialogButton(
                       child: Text(
-                          "Ir",
+                          "Cerrar",
                           style: TextStyle(color: Colors.white),
                       ),
                       onPressed: () {
-                        print("ir");
+                        Navigator.of(context, rootNavigator: true).pop();
                       },
 
                     )
@@ -73,7 +76,24 @@ class _HomePageState extends State<Home> {
               color: Colors.redAccent,
               iconSize: 45.0,
               onPressed: () {
-                print('Marker tapped');
+                return Alert(
+                    context: context,
+                    title: 'Location',
+                    desc: 'This is your actual location',
+                    style: AlertStyle(isCloseButton: false),
+                    buttons: [
+                      DialogButton(
+                        child: Text(
+                          "Cerrar",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        onPressed: () {
+                          Navigator.of(context, rootNavigator: true).pop();
+                        },
+
+                      )
+                    ]
+                ).show();
               },
             ),
           )
@@ -91,25 +111,40 @@ class _HomePageState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    _getCurrentLocation();
+    //_getCurrentLocation();
     return Scaffold(
       appBar: AppBar(
         title: Text("Location"),
       ),
-      body: new FlutterMap(
-          options: new MapOptions( center: new LatLng(_currentPosition.latitude, _currentPosition.longitude), minZoom: 10.0),
-          layers: [
-            new TileLayerOptions(
-                urlTemplate:
-                "https://api.mapbox.com/styles/v1/rajayogan/cjl1bndoi2na42sp2pfh2483p/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoiZGllZ29nb21leiIsImEiOiJjam5qaW1xeXMwenNsM2tueXFiZWZ1andiIn0.suJs58a1pOpL4c-rQzU2VA",
-                additionalOptions: {
-                  'accessToken':
-                  'pk.eyJ1IjoiZGllZ29nb21leiIsImEiOiJjam5qaW1xeXMwenNsM2tueXFiZWZ1andiIn0.suJs58a1pOpL4c-rQzU2VA',
-                  'id': 'mapbox.mapbox-streets-v7'
-                }),
-            new MarkerLayerOptions(markers: _markersView)
-          ]
-      )
+      body: FutureBuilder(
+          future: _getCurrentLocation(),
+          builder: (ctx, snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              return new FlutterMap(
+                  options: new MapOptions( center: new LatLng(_currentPosition.latitude, _currentPosition.longitude), minZoom: 10.0),
+                  layers: [
+                    new TileLayerOptions(
+                        urlTemplate:
+                        "https://api.mapbox.com/styles/v1/rajayogan/cjl1bndoi2na42sp2pfh2483p/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoiZGllZ29nb21leiIsImEiOiJjam5qaW1xeXMwenNsM2tueXFiZWZ1andiIn0.suJs58a1pOpL4c-rQzU2VA",
+                        additionalOptions: {
+                          'accessToken':
+                          'pk.eyJ1IjoiZGllZ29nb21leiIsImEiOiJjam5qaW1xeXMwenNsM2tueXFiZWZ1andiIn0.suJs58a1pOpL4c-rQzU2VA',
+                          'id': 'mapbox.mapbox-streets-v7'
+                        }),
+                    new MarkerLayerOptions(markers: _markersView)
+                  ]
+              );
+            }
+            else {
+              return Container(
+                color: Colors.lightBlue,
+                child: Center(
+                  child: Loading(indicator: BallPulseIndicator(), size: 100.0),
+                ),
+              );
+            }
+          }
+      ),
     );
   }
 
@@ -124,8 +159,8 @@ class _HomePageState extends State<Home> {
             getMarkers().then((marks) => {
               setState(() {
                 _markersView = marks;
-              }
-            )});
+              })
+            });
           });
         }
     });
@@ -143,12 +178,13 @@ class _HomePageState extends State<Home> {
   }
 
   _getAllPublications() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     var response = await http.get(
-        Uri.encodeFull("http://192.168.20.56:3000/publications"),
+        Uri.encodeFull("http://192.168.1.63:3000/publications"),
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json",
-          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwibmFtZSI6IkRpZWdvIiwiZW1haWwiOiJnb21lemRpZWdvMTk5OEBnbWFpbC5jb20iLCJpYXQiOjE1NzM4Njg4MTgsImV4cCI6MTU3Mzk1NTIxOH0.SrWAYxhSjqbHkXfj_W8xNCNwNN9Q-pkrKTuV6jFxlK8"
+          "Authorization": "Bearer " + prefs.getString('token')
         }
     );
     if (response.statusCode >= 200 && response.statusCode < 210) {
