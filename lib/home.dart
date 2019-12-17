@@ -161,7 +161,7 @@ class _HomePageState extends State<Home> {
   _getAllPublications() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var response = await http.get(
-        Uri.encodeFull("http://192.168.20.56:3000/publications"),
+        Uri.encodeFull("https://momentos-backend.herokuapp.com/publications"),
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json",

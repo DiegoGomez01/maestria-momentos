@@ -6,18 +6,13 @@ import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 
-const users = const {
-  'dribbble@gmail.com': '12345',
-  'hunter@gmail.com': 'hunter',
-};
-
 class LoginScreen extends StatelessWidget {
   Duration get loginTime => Duration(milliseconds: 2250);
   var contextGeneral;
 
   Future<String> _createUser(LoginData data) async {
     var response = await http.post(
-        Uri.encodeFull("http://192.168.20.56:3000/register"),
+        Uri.encodeFull("https://momentos-backend.herokuapp.com/register"),
         headers: {
           "Content-Type": "application/json",
         },
@@ -38,7 +33,7 @@ class LoginScreen extends StatelessWidget {
 
   Future<String> _authUser(LoginData data) async {
     var response = await http.post(
-        Uri.encodeFull("http://192.168.20.56:3000/login"),
+        Uri.encodeFull("https://momentos-backend.herokuapp.com/login"),
         headers: {
           "Content-Type": "application/json",
         },
@@ -58,19 +53,14 @@ class LoginScreen extends StatelessWidget {
 
   Future<String> _recoverPassword(String name) {
     print('Name: $name');
-    return Future.delayed(loginTime).then((_) {
-      if (!users.containsKey(name)) {
-        return 'Username not exists';
-      }
-      return null;
-    });
+    return Future.value('Building');
   }
 
   @override
   Widget build(BuildContext context) {
     this.contextGeneral = context;
     return FlutterLogin(
-      title: '',
+      title: 'Momentos',
       logo: 'assets/images/momentos.png',
       onLogin: _authUser,
       onSignup: _createUser,

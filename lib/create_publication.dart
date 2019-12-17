@@ -55,7 +55,7 @@ class MyCustomFormState extends State<MyCustomForm> {
         key: _formKey,
         child: new Column(
             children : [
-              new Padding(padding: EdgeInsets.only(top: 70.0)),
+              new Padding(padding: EdgeInsets.only(top: 30.0)),
               new Text('Crear publicación',
                 style: new TextStyle(color: Color(int.parse("#F2A03D".substring(1, 7), radix: 16) + 0xFF000000), fontSize: 25.0),),
               new Padding(padding: EdgeInsets.only(top: 50.0)),
@@ -141,7 +141,7 @@ class MyCustomFormState extends State<MyCustomForm> {
   sendData(position, title, description) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var response = await http.post(
-        Uri.encodeFull("http://192.168.20.56:3000/publications"),
+        Uri.encodeFull("https://momentos-backend.herokuapp.com/publications"),
         headers: {
           "Content-Type": "application/json",
           "Authorization": "Bearer " + prefs.getString('token')
